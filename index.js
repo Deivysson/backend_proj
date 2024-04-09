@@ -5,25 +5,22 @@ const db = require('./db');
 const port = process.env.PORT;
 
 const express = require('express');
+const cors =require('cors');
 
 const app = express();
 
+app.use(cors());
+
 app.get('/', (req, res) => {
     res.json({
-        message: 'funcionando!'
+        message: 'funcionando'
     })
 })
 
 
-app.get('/pacientes/:id', async (req, res) => {
-    const paciente = await db.selectCustomer(req.params.id);
-    res.json(paciente);
 
-})
-
-
-app.get('/pacientes', async (req, res) => {
-    const pacientes = await db.selectCustomers();
+app.get('/pacientes/search', async (req, res) => {
+    const pacientes = await db.selectCustomers(req.query.name);
     res.json(pacientes);
 
 })

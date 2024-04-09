@@ -22,19 +22,13 @@ async function connect(){
 
 connect();
 
-async function selectCustomers(){
+async function selectCustomers(name){
     const client = await connect();
-    const res = await client.query('SELECT nom_paciente FROM arq_paciente');
+    const res = await client.query('SELECT nom_paciente FROM arq_paciente WHERE nom_paciente ILIKE $1', [`%${name}%`]);
     return res.rows;
 }
 
-async function selectCustomer(id){
-    const client = await connect();
-    const res = await client.query('SELECT nom_paciente FROM arq_paciente WHERE ID=$1', [id]);
-    return res.rows;
-}
 
 module.exports = {
-    selectCustomers,
-    selectCustomer
+    selectCustomers
 }
