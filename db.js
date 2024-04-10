@@ -24,7 +24,7 @@ connect();
 
 async function selectCustomers(name){
     const client = await connect();
-    const res = await client.query('SELECT nom_paciente FROM arq_paciente WHERE nom_paciente ILIKE $1', [`%${name}%`]);
+    const res = await client.query('SELECT nom_paciente, num_cpf FROM arq_paciente WHERE nom_paciente ILIKE $1', [`%${name}%`]);
     return res.rows;
 }
 
