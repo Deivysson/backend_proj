@@ -28,9 +28,9 @@ async function selectCustomers(name){
     return res.rows;
 }
 
-async function insertUser(login, senha) {
+async function insertUser(login, senha, cod_paciente) {
     const client = await connect();
-    const res = await client.query('INSERT INTO usuarios (login, senha) VALUES ($1, $2)', [login, senha]);
+    const res = await client.query('INSERT INTO usuarios (login, senha, cod_paciente) VALUES ($1, $2, $3)', [login, senha, cod_paciente]);
     client.release();
     return res.rowCount;
 }
