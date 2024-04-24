@@ -35,9 +35,18 @@ async function insertUser(login, senha, cod_paciente) {
     return res.rowCount;
 }
 
+async function authenticateUser(login, senha) {
+    const client = await connect();
+    const res = await client.query('SELECT * FROM usuarios WHERE login = $1 AND senha = $2', [login, senha]);
+    client.release();
+    return res.rows[0];
+}
+
+
 
 
 module.exports = {
     selectCustomers,
-    insertUser
+    insertUser,
+    authenticateUser
 }

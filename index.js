@@ -47,6 +47,17 @@ app.get('/pacientes/search', async (req, res) => {
 
 })
 
+app.post('/authenticate', async (req, res) => {
+    const { login, senha } = req.body;
+    const user = await db.authenticateUser(login, senha);
+    if (user) {
+        res.status(200).json({ message: 'Autenticação bem-sucedida!', user });
+    } else {
+        res.status(401).json({ message: 'Login ou senha inválidos.' });
+    }
+});
+
+
 app.listen(port);
 
 console.log('backend rodando');
