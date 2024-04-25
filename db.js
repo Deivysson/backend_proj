@@ -44,7 +44,7 @@ async function authenticateUser(login, senha) {
 
 async function selectUserDetails(cod_paciente) {
     const client = await connect();
-    const res = await client.query('SELECT nom_paciente, num_cpf FROM arq_paciente WHERE cod_paciente = $1', [cod_paciente]);
+    const res = await client.query('SELECT nom_paciente, num_cpf, des_endereco, des_email FROM arq_paciente WHERE cod_paciente = $1', [cod_paciente]);
     client.release();
     return res.rows[0];
 }
