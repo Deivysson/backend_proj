@@ -57,6 +57,16 @@ app.post('/authenticate', async (req, res) => {
     }
 });
 
+app.get('/exames', async (req, res) => {
+    const cod_paciente = req.query.cod_paciente;
+    const exames = await db.selectUserDetails(cod_paciente);
+    if (exames) {
+        res.status(200).json({ message: 'Dados inseridos corretamente.', exames });
+    } else {
+        res.status(401).json({ message: 'Dados invalidos.' });
+    }
+});
+
 
 app.listen(port);
 
