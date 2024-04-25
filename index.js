@@ -51,11 +51,14 @@ app.post('/authenticate', async (req, res) => {
     const { login, senha } = req.body;
     const user = await db.authenticateUser(login, senha);
     if (user) {
-        res.status(200).json({ message: 'Autenticação bem-sucedida!', user });
+        const cod_paciente = user.cod_paciente;
+        const exames = await db.selectUserDetails(cod_paciente);
+        res.status(200).json({ message: 'Autenticação bem-sucedida!', user, exames });
     } else {
         res.status(401).json({ message: 'Login ou senha inválidos.' });
     }
 });
+
 
 app.get('/exames', async (req, res) => {
     const cod_paciente = req.query.cod_paciente;
