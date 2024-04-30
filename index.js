@@ -6,12 +6,26 @@ const port = process.env.PORT;
 
 const express = require('express');
 
+const multer = require('multer');
+
 const bodyParser = require('body-parser');
 
 
 const cors =require('cors');
 
 const app = express();
+
+// Configuracao do multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'upload/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -69,6 +83,10 @@ app.get('/exames', async (req, res) => {
         res.status(401).json({ message: 'Dados invalidos.' });
     }
 });
+
+app.post('/upload', upload.single('arquivo'), (req, res) => {
+    res.status(200).json({ message: 'Arquivo recebido com sucesso!' });
+   });
 
 
 app.listen(port);
