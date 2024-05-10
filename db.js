@@ -35,6 +35,19 @@ async function insertUser(login, senha, cod_paciente) {
     return res.rowCount;
 }
 
+/*async function insertUser(login, senha, cod_paciente) {
+    const client = await connect();
+    
+    const res = await client.query(`
+        INSERT INTO usuarios (login, senha, cod_paciente) 
+        VALUES ($1, $2, $3)
+        ON CONFLICT (cod_paciente) 
+        DO UPDATE SET login = excluded.login, senha = excluded.senha
+    `, [login, senha, cod_paciente]);
+    client.release();
+    return res.rowCount;
+}*/
+
 async function authenticateUser(login, senha) {
     const client = await connect();
     const res = await client.query('SELECT * FROM usuarios WHERE login = $1 AND senha = $2', [login, senha]);
