@@ -27,7 +27,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.use(cors());
+/*app.use(cors());*/
+
+app.use(cors({
+    origin: '*', // Para permitir todas as origens (para desenvolvimento apenas)
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: 'Content-Type,Authorization'
+  }));
+
 app.use(bodyParser.json());
 
 app.post('/usuarios', async (req, res) => {
