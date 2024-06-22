@@ -2,30 +2,41 @@ require('dotenv').config();
 
 const db = require('./db');
 
+
 const port = process.env.PORT;
 
 const express = require('express');
 
 const multer = require('multer');
 
+const path = require('path');
+
 const bodyParser = require('body-parser');
 
 
-const cors =require('cors');
+
+const cors = require('cors');
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, 'upload')));
+
 // Configuracao do multer
+// Configuração do armazenamento de arquivos
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'upload/');
     },
     filename: function (req, file, cb) {
-        cb(null, file.originalname);
+        const ext = path.extname(file.originalname);
+        cb(null, file.originalname.replace(/\.[^/.]+$/, "") + '-' + Date.now() + ext);
     }
 });
 
+// Criação do objeto de upload
 const upload = multer({ storage: storage });
+
+
 
 /*app.use(cors());*/
 
@@ -35,7 +46,11 @@ app.use(cors({
     allowedHeaders: 'Content-Type,Authorization'
   }));
 
+  app.use(express.json());
+
 app.use(bodyParser.json());
+
+
 
 app.post('/usuarios', async (req, res) => {
     const usuario = { login: req.body.login, senha: req.body.senha, cod_paciente: req.body.cod_paciente };
@@ -81,7 +96,7 @@ app.post('/authenticate', async (req, res) => {
 });
 
 
-app.get('/exames', async (req, res) => {
+app.get('/exames/detalhes', async (req, res) => {
     const cod_paciente = req.query.cod_paciente;
     const exames = await db.selectUserDetails(cod_paciente);
     if (exames) {
@@ -92,27 +107,52 @@ app.get('/exames', async (req, res) => {
 });
 
 app.post('/upload', upload.single('arquivo'), async (req, res) => {
-    const cod_paciente = req.body.cod_paciente;
-    const nome_arquivo = req.file.originalname;
-    const caminho_arquivo = req.file.path;
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'Nenhum arquivo enviado.' });
+        }
 
-    const rowsAffected = await db.insertFile(nome_arquivo, caminho_arquivo, cod_paciente);
-    if (rowsAffected > 0) {
-        res.status(200).json({ message: 'Arquivo recebido com sucesso!' });
-    } else {
-        res.status(500).json({ message: 'Erro ao salvar o arquivo.' });
+        const nome_arquivo = req.file.originalname;
+        const caminho_arquivo = req.file.path;
+
+        // Lógica para salvar no banco de dados ou retornar caminho do arquivo
+        // Exemplo: inserir no banco de dados
+        const rowsAffected = await db.insertFile(nome_arquivo, caminho_arquivo, req.body.cod_paciente);
+
+        if (rowsAffected > 0) {
+            res.status(200).json({ message: 'Arquivo recebido e salvo com sucesso!', caminho_arquivo });
+        } else {
+            res.status(500).json({ message: 'Erro ao salvar o arquivo no banco de dados.' });
+        }
+    } catch (error) {
+        console.error('Erro no upload do arquivo:', error);
+        res.status(500).json({ message: 'Erro interno do servidor ao processar o upload.' });
     }
 });
 
-app.get('/exames', async (req, res) => {
+
+
+
+app.get('/exames/arquivos', async (req, res) => {
     const cod_paciente = req.query.cod_paciente;
-    const exames = await db.selectFiles(cod_paciente);
-    if (exames) {
-        res.status(200).json({ exames });
-    } else {
-        res.status(404).json({ message: 'Nenhum exame encontrado.' });
+
+    if (!cod_paciente) {
+        return res.status(400).json({ message: 'cod_paciente é obrigatório.' });
+    }
+
+    try {
+        const exames = await db.selectFiles(cod_paciente);
+        if (exames) {
+            res.status(200).json({ exames });
+        } else {
+            res.status(404).json({ message: 'Nenhum exame encontrado.' });
+        }
+    } catch (error) {
+        console.error('Erro ao buscar arquivos de exames:', error);
+        res.status(500).json({ message: 'Erro interno do servidor.' });
     }
 });
+
 
 app.listen(port);
 
