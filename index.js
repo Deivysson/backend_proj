@@ -91,10 +91,28 @@ app.get('/exames', async (req, res) => {
     }
 });
 
-app.post('/upload', upload.single('arquivo'), (req, res) => {
-    res.status(200).json({ message: 'Arquivo recebido com sucesso!' });
-   });
+app.post('/upload', upload.single('arquivo'), async (req, res) => {
+    const cod_paciente = req.body.cod_paciente;
+    const nome_arquivo = req.file.originalname;
+    const caminho_arquivo = req.file.path;
 
+    const rowsAffected = await db.insertFile(nome_arquivo, caminho_arquivo, cod_paciente);
+    if (rowsAffected > 0) {
+        res.status(200).json({ message: 'Arquivo recebido com sucesso!' });
+    } else {
+        res.status(500).json({ message: 'Erro ao salvar o arquivo.' });
+    }
+});
+
+app.get('/exames', async (req, res) => {
+    const cod_paciente = req.query.cod_paciente;
+    const exames = await db.selectFiles(cod_paciente);
+    if (exames) {
+        res.status(200).json({ exames });
+    } else {
+        res.status(404).json({ message: 'Nenhum exame encontrado.' });
+    }
+});
 
 app.listen(port);
 
