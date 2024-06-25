@@ -19,8 +19,11 @@ const cors = require('cors');
 
 const app = express();
 
-app.use(express.static(path.join(__dirname, 'upload')));
+app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
+
+// Configuracao do multer
+// Configuração do armazenamento de arquivos
 // Configuracao do multer
 // Configuração do armazenamento de arquivos
 const storage = multer.diskStorage({
@@ -28,13 +31,13 @@ const storage = multer.diskStorage({
         cb(null, 'upload/');
     },
     filename: function (req, file, cb) {
-        const ext = path.extname(file.originalname);
-        cb(null, file.originalname.replace(/\.[^/.]+$/, "") + '-' + Date.now() + ext);
+        cb(null, file.originalname); // Use o nome original do arquivo
     }
 });
 
 // Criação do objeto de upload
 const upload = multer({ storage: storage });
+
 
 
 
@@ -112,15 +115,13 @@ app.post('/upload', upload.single('arquivo'), async (req, res) => {
             return res.status(400).json({ message: 'Nenhum arquivo enviado.' });
         }
 
-        const nome_arquivo = req.file.originalname;
+        const nome_arquivo = req.file.originalname; // Nome original do arquivo
         const caminho_arquivo = req.file.path;
 
-        // Lógica para salvar no banco de dados ou retornar caminho do arquivo
-        // Exemplo: inserir no banco de dados
         const rowsAffected = await db.insertFile(nome_arquivo, caminho_arquivo, req.body.cod_paciente);
 
         if (rowsAffected > 0) {
-            res.status(200).json({ message: 'Arquivo recebido e salvo com sucesso!', caminho_arquivo });
+            res.status(200).json({ message: 'Arquivo recebido e salvo com sucesso!', nome_arquivo });
         } else {
             res.status(500).json({ message: 'Erro ao salvar o arquivo no banco de dados.' });
         }
