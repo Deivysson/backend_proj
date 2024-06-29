@@ -62,16 +62,16 @@ async function selectUserDetails(cod_paciente) {
     return res.rows[0];
 }
 
-async function insertFile(nome_arquivo, caminho_arquivo, cod_paciente) {
+async function insertFile(nome_arquivo, caminho_arquivo, cod_paciente, exame, data_exame, medico) {
     const client = await connect();
-    const res = await client.query('INSERT INTO arquivos (nome_arquivo, caminho_arquivo, cod_paciente) VALUES ($1, $2, $3)', [nome_arquivo, caminho_arquivo, cod_paciente]);
+    const res = await client.query('INSERT INTO arquivos (nome_arquivo, caminho_arquivo, cod_paciente, exame, data_exame, medico) VALUES ($1, $2, $3, $4, $5, $6)', [nome_arquivo, caminho_arquivo, cod_paciente, exame, data_exame, medico]);
     client.release();
     return res.rowCount;
 }
 
 async function selectFiles(cod_paciente) {
     const client = await connect();
-    const res = await client.query('SELECT nome_arquivo, caminho_arquivo FROM arquivos WHERE cod_paciente = $1', [cod_paciente]);
+    const res = await client.query('SELECT nome_arquivo, caminho_arquivo, exame, data_exame, medico FROM arquivos WHERE cod_paciente = $1', [cod_paciente]);
     client.release();
     return res.rows;
 }

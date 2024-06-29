@@ -115,10 +115,11 @@ app.post('/upload', upload.single('arquivo'), async (req, res) => {
             return res.status(400).json({ message: 'Nenhum arquivo enviado.' });
         }
 
-        const nome_arquivo = req.file.originalname; // Nome original do arquivo
+        const { cod_paciente, exame, data_exame, medico } = req.body;
+        const nome_arquivo = req.file.originalname;
         const caminho_arquivo = req.file.path;
 
-        const rowsAffected = await db.insertFile(nome_arquivo, caminho_arquivo, req.body.cod_paciente);
+        const rowsAffected = await db.insertFile(nome_arquivo, caminho_arquivo, cod_paciente, exame, data_exame, medico);
 
         if (rowsAffected > 0) {
             res.status(200).json({ message: 'Arquivo recebido e salvo com sucesso!', nome_arquivo });
