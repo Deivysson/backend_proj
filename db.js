@@ -71,10 +71,15 @@ async function insertFile(nome_arquivo, caminho_arquivo, cod_paciente, exame, da
 
 async function selectFiles(cod_paciente) {
     const client = await connect();
-    const res = await client.query('SELECT nome_arquivo, caminho_arquivo, exame, data_exame, medico FROM arquivos WHERE cod_paciente = $1', [cod_paciente]);
+    const res = await client.query(`
+        SELECT nome_arquivo, caminho_arquivo, exame, to_char(data_exame, 'YYYY-MM-DD') as data_exame, medico 
+        FROM arquivos 
+        WHERE cod_paciente = $1
+    `, [cod_paciente]);
     client.release();
     return res.rows;
 }
+
 
 async function selectMedicos() {
     const client = await connect();
