@@ -154,6 +154,26 @@ app.get('/exames/arquivos', async (req, res) => {
     }
 });
 
+app.get('/medicos', async (req, res) => {
+    try {
+        const medicos = await db.selectMedicos();
+        res.status(200).json(medicos);
+    } catch (error) {
+        console.error('Erro ao buscar médicos:', error);
+        res.status(500).json({ message: 'Erro interno do servidor.' });
+    }
+});
+
+app.get('/tipos_exames', async (req, res) => {
+    try {
+        const tiposExames = await db.selectTiposExames();
+        res.status(200).json(tiposExames);
+    } catch (error) {
+        console.error('Erro ao buscar tipos de exames:', error);
+        res.status(500).json({ message: 'Erro interno do servidor.' });
+    }
+});
+
 
 app.listen(port);
 

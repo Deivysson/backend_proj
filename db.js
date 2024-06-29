@@ -76,6 +76,18 @@ async function selectFiles(cod_paciente) {
     return res.rows;
 }
 
+async function selectMedicos() {
+    const client = await connect();
+    const res = await client.query('SELECT nom_medico FROM arq_medico');
+    return res.rows;
+}
+
+async function selectTiposExames() {
+    const client = await connect();
+    const res = await client.query('SELECT nome FROM tipos_exames');
+    return res.rows;
+}
+
 
 module.exports = {
     selectCustomers,
@@ -83,5 +95,7 @@ module.exports = {
     authenticateUser,
     selectUserDetails,
     insertFile,
-    selectFiles
+    selectFiles,
+    selectMedicos,
+    selectTiposExames,
 }
